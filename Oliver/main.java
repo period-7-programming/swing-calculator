@@ -25,7 +25,6 @@ public class main extends JFrame {
 		this.setSize(300, 400);
 		this.getContentPane().setLayout(null);
 		JTextField equationDisplay = new JTextField();
-		;
 		equationDisplay.setBounds(7, 7, 270, 61);
 		this.add(equationDisplay);
 		for (i = 0; i < buttonX.length; i++) {
@@ -62,9 +61,9 @@ public class main extends JFrame {
 
 	String calculate(String equation) {
 		if (equation.contains("(")) {
-			String result = calculate(equation.substring(equation.indexOf("(") + 1 , equation.indexOf(")")));
+			String result = calculate(equation.substring(equation.indexOf("(") + 1 , equation.lastIndexOf(")")));
 			equation = equation.substring(0, equation.indexOf("("))
-					+ result + equation.substring(equation.indexOf(")") + 1);
+					+ result + equation.substring(equation.lastIndexOf(")") + 1);
 		}
 
 		if (equation.contains("*") || equation.contains("/")) {
