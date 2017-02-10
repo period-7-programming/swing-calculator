@@ -1,10 +1,8 @@
 package calculator;
-
+//doesn't work with negatives because it takes the negative as an operation and having errors
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class main extends JFrame {
 	int[] buttonX = { 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147 }; // coordinates
@@ -97,9 +95,20 @@ public class main extends JFrame {
 					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 						endNumTwo = secondHalf.indexOf("/");
 					}
+					if (equation.substring(startNumOne, equation.indexOf("*")).contains("_")) {
+						equation.substring(startNumOne, equation.indexOf("*")).replace("_", "-");
+					}
+					if (equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).contains("_")) {
+						equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).replace("_", "-");
+					}
 					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("*")))
 							* Float.parseFloat(equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")));
-					equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+					String negative = "";
+					if (calculation < 0) {
+						negative = "_";
+						calculation = Math.abs(calculation);
+					}
+					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 							+ equation.substring(endNumTwo + 1 + equation.indexOf("*"));
 				} else {
 					String firstHalf = equation.substring(0, equation.indexOf("/"));
@@ -130,9 +139,20 @@ public class main extends JFrame {
 					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 						endNumTwo = secondHalf.indexOf("/");
 					}
+					if (equation.substring(startNumOne, equation.indexOf("/")).contains("_")) {
+						equation.substring(startNumOne, equation.indexOf("/")).replace("_", "-");
+					}
+					if (equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).contains("_")) {
+						equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).replace("_", "-");
+					}
 					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("/")))
 							/ Float.parseFloat(equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")));
-					equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+					String negative = "";
+					if (calculation < 0) {
+						negative = "_";
+						calculation = Math.abs(calculation);
+					}
+					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 							+ equation.substring(endNumTwo + 1 + equation.indexOf("/"));
 				}
 			} else if (equation.contains("*")) {
@@ -164,9 +184,20 @@ public class main extends JFrame {
 				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 					endNumTwo = secondHalf.indexOf("/");
 				}
+				if (equation.substring(startNumOne, equation.indexOf("*")).contains("_")) {
+					equation.substring(startNumOne, equation.indexOf("*")).replace("_", "-");
+				}
+				if (equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).contains("_")) {
+					equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).replace("_", "-");
+				}
 				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("*")))
 						* Float.parseFloat(equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")));
-				equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+				String negative = "";
+				if (calculation < 0) {
+					negative = "_";
+					calculation = Math.abs(calculation);
+				}
+				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 						+ equation.substring(endNumTwo + 1 + equation.indexOf("*"));
 			} else {
 				String firstHalf = equation.substring(0, equation.indexOf("/"));
@@ -197,9 +228,20 @@ public class main extends JFrame {
 				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 					endNumTwo = secondHalf.indexOf("/");
 				}
+				if (equation.substring(startNumOne, equation.indexOf("/")).contains("_")) {
+					equation.substring(startNumOne, equation.indexOf("/")).replace("_", "-");
+				}
+				if (equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).contains("_")) {
+					equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).replace("_", "-");
+				}
 				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("/")))
 						/ Float.parseFloat(equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")));
-				equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+				String negative = "";
+				if (calculation < 0) {
+					negative = "_";
+					calculation = Math.abs(calculation);
+				}
+				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 						+ equation.substring(endNumTwo + 1 + equation.indexOf("/"));
 			}
 			equation = calculate(equation);
@@ -228,9 +270,20 @@ public class main extends JFrame {
 					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 						endNumTwo = secondHalf.indexOf("/");
 					}
+					if (equation.substring(startNumOne, equation.indexOf("+")).contains("_")) {
+						equation.substring(startNumOne, equation.indexOf("+")).replace("_", "-");
+					}
+					if (equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).contains("_")) {
+						equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).replace("_", "-");
+					}
 					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("+")))
 							+ Float.parseFloat(equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")));
-					equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+					String negative = "";
+					if (calculation < 0) {
+						negative = "_";
+						calculation = Math.abs(calculation);
+					}
+					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 							+ equation.substring(endNumTwo + 1 + equation.indexOf("+"));
 				} else {
 					String firstHalf = equation.substring(0, equation.indexOf("-"));
@@ -261,9 +314,20 @@ public class main extends JFrame {
 					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 						endNumTwo = secondHalf.indexOf("/");
 					}
+					if (equation.substring(startNumOne, equation.indexOf("-")).contains("_")) {
+						equation.substring(startNumOne, equation.indexOf("-")).replace("_", "-");
+					}
+					if (equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).contains("_")) {
+						equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).replace("_", "-");
+					}
 					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("-")))
 							- Float.parseFloat(equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")));
-					equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+					String negative = "";
+					if (calculation < 0) {
+						negative = "_";
+						calculation = Math.abs(calculation);
+					}
+					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 							+ equation.substring(endNumTwo + 1 + equation.indexOf("-"));
 				}
 			} else if (equation.contains("+")) {
@@ -295,9 +359,20 @@ public class main extends JFrame {
 				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 					endNumTwo = secondHalf.indexOf("/");
 				}
+				if (equation.substring(startNumOne, equation.indexOf("+")).contains("_")) {
+					equation.substring(startNumOne, equation.indexOf("+")).replace("_", "-");
+				}
+				if (equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).contains("_")) {
+					equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).replace("_", "-");
+				}
 				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("+")))
 						+ Float.parseFloat(equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")));
-				equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+				String negative = "";
+				if (calculation < 0) {
+					negative = "_";
+					calculation = Math.abs(calculation);
+				}
+				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 						+ equation.substring(endNumTwo + 1 + equation.indexOf("+"));
 			} else {
 				String firstHalf = equation.substring(0, equation.indexOf("-"));
@@ -311,7 +386,7 @@ public class main extends JFrame {
 				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
 					startNumOne = firstHalf.indexOf("*");
 				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
+				if (firstHalf.contains("/") && firstHalf.indexOf("/") > startNumOne) {
 					startNumOne = firstHalf.indexOf("/");
 				}
 				String secondHalf = equation.substring(equation.indexOf("-") + 1);
@@ -328,9 +403,20 @@ public class main extends JFrame {
 				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
 					endNumTwo = secondHalf.indexOf("/");
 				}
+				if (equation.substring(startNumOne, equation.indexOf("-")).contains("_")) {
+					equation.substring(startNumOne, equation.indexOf("-")).replace("_", "-");
+				}
+				if (equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).contains("_")) {
+					equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).replace("_", "-");
+				}
 				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("-")))
 						- Float.parseFloat(equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")));
-				equation = equation.substring(0, startNumOne) + Float.toString(calculation)
+				String negative = "";
+				if (calculation < 0) {
+					negative = "_";
+					calculation = Math.abs(calculation);
+				}
+				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
 						+ equation.substring(endNumTwo + 1 + equation.indexOf("-"));
 			}
 			equation = calculate(equation);
