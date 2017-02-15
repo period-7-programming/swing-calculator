@@ -1,10 +1,16 @@
 package calculator;
+
 //doesn't work with negatives because it takes the negative as an operation and having errors
 import javax.swing.*;
+
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class main extends JFrame {
+	ArrayList<Token> equationParts = new ArrayList<Token>();
 	int[] buttonX = { 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147 }; // coordinates
 	int[] buttonY = { 75, 75, 75, 75, 135, 135, 135, 135, 195, 195, 195, 195, 255, 255, 255, 255, 315, 315, 315 };
 	int[] buttonWidth = { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 130 };
@@ -40,7 +46,8 @@ public class main extends JFrame {
 				};
 			} else if (i == 14) {
 				listen = new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
+
+	public void actionPerformed(ActionEvent arg0) {
 						equationDisplay.setText(
 								equationDisplay.getText().substring(0, equationDisplay.getText().length() - 1));
 					}
@@ -51,376 +58,52 @@ public class main extends JFrame {
 						equationDisplay.setText(calculate(equationDisplay.getText()));
 					}
 				};
-			}
-			buttons[i].addActionListener(listen);
-		}
-		this.setTitle("Calculator");
-	}
+			}buttons[i].addActionListener(listen);
+
+	}this.setTitle("Calculator");}
 
 	String calculate(String equation) {
+		String numbers = "0123456789.";
+		String operations = "+-/*";
+		// check if there's other characters HERE
 		if (equation.contains("(")) {
-			String result = calculate(equation.substring(equation.indexOf("(") + 1 , equation.lastIndexOf(")")));
-			equation = equation.substring(0, equation.indexOf("("))
-					+ result + equation.substring(equation.lastIndexOf(")") + 1);
+			String result = calculate(equation.substring(equation.indexOf("(") + 1, equation.lastIndexOf(")")));
+			equation = equation.substring(0, equation.indexOf("(")) + result
+					+ equation.substring(equation.lastIndexOf(")") + 1);
 		}
+		String currentToken = "";
+		boolean lastTokenOperation = false;
+		for (int i = 0; i < equation.length(); i++) {
+			if (numbers.contains(Character.toString(equation.charAt(i)))) {
+				currentToken = currentToken + equation.charAt(i);
+			} else {
+				if (true)// if char is - and last was operation
+				{
+					Token number = new NumberToken(Double.parseDouble((currentToken)));
+					equationParts.add(number);
+					currentToken = Character.toString(equation.charAt(i));
+				} else {
+				}
+			}
+			return equation;
+		}
+	}
 
-		if (equation.contains("*") || equation.contains("/")) {
-			if (equation.contains("*") && equation.contains("/")) {
-				if (equation.indexOf("*") < equation.indexOf("/")) {
-					String firstHalf = equation.substring(0, equation.indexOf("*"));
-					int startNumOne = 0;
-					if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-						startNumOne = firstHalf.indexOf("+");
-					}
-					if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-						startNumOne = firstHalf.indexOf("-");
-					}
-					if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-						startNumOne = firstHalf.indexOf("*");
-					}
-					if (firstHalf.contains("/") && firstHalf.indexOf("/") > startNumOne) {
-						startNumOne = firstHalf.indexOf("/");
-					}
-					String secondHalf = equation.substring(equation.indexOf("*") + 1);
-					int endNumTwo = secondHalf.length();
-					if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("+");
-					}
-					if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("-");
-					}
-					if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("*");
-					}
-					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("/");
-					}
-					if (equation.substring(startNumOne, equation.indexOf("*")).contains("_")) {
-						equation.substring(startNumOne, equation.indexOf("*")).replace("_", "-");
-					}
-					if (equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).contains("_")) {
-						equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).replace("_", "-");
-					}
-					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("*")))
-							* Float.parseFloat(equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")));
-					String negative = "";
-					if (calculation < 0) {
-						negative = "_";
-						calculation = Math.abs(calculation);
-					}
-					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-							+ equation.substring(endNumTwo + 1 + equation.indexOf("*"));
-				} else {
-					String firstHalf = equation.substring(0, equation.indexOf("/"));
-					int startNumOne = 0;
-					if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-						startNumOne = firstHalf.indexOf("+");
-					}
-					if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-						startNumOne = firstHalf.indexOf("-");
-					}
-					if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-						startNumOne = firstHalf.indexOf("*");
-					}
-					if (firstHalf.contains("/") && firstHalf.indexOf("/") > startNumOne) {
-						startNumOne = firstHalf.indexOf("/");
-					}
-					String secondHalf = equation.substring(equation.indexOf("/") + 1);
-					int endNumTwo = secondHalf.length();
-					if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("+");
-					}
-					if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("-");
-					}
-					if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("*");
-					}
-					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("/");
-					}
-					if (equation.substring(startNumOne, equation.indexOf("/")).contains("_")) {
-						equation.substring(startNumOne, equation.indexOf("/")).replace("_", "-");
-					}
-					if (equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).contains("_")) {
-						equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).replace("_", "-");
-					}
-					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("/")))
-							/ Float.parseFloat(equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")));
-					String negative = "";
-					if (calculation < 0) {
-						negative = "_";
-						calculation = Math.abs(calculation);
-					}
-					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-							+ equation.substring(endNumTwo + 1 + equation.indexOf("/"));
-				}
-			} else if (equation.contains("*")) {
-				String firstHalf = equation.substring(0, equation.indexOf("*"));
-				int startNumOne = 0;
-				if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-					startNumOne = firstHalf.indexOf("+");
-				}
-				if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-					startNumOne = firstHalf.indexOf("-");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("*");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("/");
-				}
-				String secondHalf = equation.substring(equation.indexOf("*") + 1);
-				int endNumTwo = secondHalf.length();
-				if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("+");
-				}
-				if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("-");
-				}
-				if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("*");
-				}
-				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("/");
-				}
-				if (equation.substring(startNumOne, equation.indexOf("*")).contains("_")) {
-					equation.substring(startNumOne, equation.indexOf("*")).replace("_", "-");
-				}
-				if (equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).contains("_")) {
-					equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")).replace("_", "-");
-				}
-				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("*")))
-						* Float.parseFloat(equation.substring(equation.indexOf("*") + 1, endNumTwo + 1 + equation.indexOf("*")));
-				String negative = "";
-				if (calculation < 0) {
-					negative = "_";
-					calculation = Math.abs(calculation);
-				}
-				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-						+ equation.substring(endNumTwo + 1 + equation.indexOf("*"));
-			} else {
-				String firstHalf = equation.substring(0, equation.indexOf("/"));
-				int startNumOne = 0;
-				if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-					startNumOne = firstHalf.indexOf("+");
-				}
-				if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-					startNumOne = firstHalf.indexOf("-");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("*");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("/");
-				}
-				String secondHalf = equation.substring(equation.indexOf("/") + 1);
-				int endNumTwo = secondHalf.length();
-				if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("+");
-				}
-				if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("-");
-				}
-				if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("*");
-				}
-				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("/");
-				}
-				if (equation.substring(startNumOne, equation.indexOf("/")).contains("_")) {
-					equation.substring(startNumOne, equation.indexOf("/")).replace("_", "-");
-				}
-				if (equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).contains("_")) {
-					equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")).replace("_", "-");
-				}
-				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("/")))
-						/ Float.parseFloat(equation.substring(equation.indexOf("/") + 1, endNumTwo + 1 + equation.indexOf("/")));
-				String negative = "";
-				if (calculation < 0) {
-					negative = "_";
-					calculation = Math.abs(calculation);
-				}
-				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-						+ equation.substring(endNumTwo + 1 + equation.indexOf("/"));
-			}
-			equation = calculate(equation);
-		} else if (equation.contains("+") || equation.contains("-")) {
-			if (equation.contains("+") && equation.contains("-")) {
-				if (equation.indexOf("+") < equation.indexOf("-")) {
-					String firstHalf = equation.substring(0, equation.indexOf("+"));
-					int startNumOne = 0;
-					if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-						startNumOne = firstHalf.indexOf("+");
-					}
-					if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-						startNumOne = firstHalf.indexOf("-");
-					}
-					String secondHalf = equation.substring(equation.indexOf("+") + 1);
-					int endNumTwo = secondHalf.length();
-					if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("+");
-					}
-					if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("-");
-					}
-					if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("*");
-					}
-					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("/");
-					}
-					if (equation.substring(startNumOne, equation.indexOf("+")).contains("_")) {
-						equation.substring(startNumOne, equation.indexOf("+")).replace("_", "-");
-					}
-					if (equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).contains("_")) {
-						equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).replace("_", "-");
-					}
-					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("+")))
-							+ Float.parseFloat(equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")));
-					String negative = "";
-					if (calculation < 0) {
-						negative = "_";
-						calculation = Math.abs(calculation);
-					}
-					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-							+ equation.substring(endNumTwo + 1 + equation.indexOf("+"));
-				} else {
-					String firstHalf = equation.substring(0, equation.indexOf("-"));
-					int startNumOne = 0;
-					if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-						startNumOne = firstHalf.indexOf("+");
-					}
-					if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-						startNumOne = firstHalf.indexOf("-");
-					}
-					if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-						startNumOne = firstHalf.indexOf("*");
-					}
-					if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-						startNumOne = firstHalf.indexOf("/");
-					}
-					String secondHalf = equation.substring(equation.indexOf("-") + 1);
-					int endNumTwo = secondHalf.length();
-					if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("+");
-					}
-					if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("-");
-					}
-					if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("*");
-					}
-					if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-						endNumTwo = secondHalf.indexOf("/");
-					}
-					if (equation.substring(startNumOne, equation.indexOf("-")).contains("_")) {
-						equation.substring(startNumOne, equation.indexOf("-")).replace("_", "-");
-					}
-					if (equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).contains("_")) {
-						equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).replace("_", "-");
-					}
-					float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("-")))
-							- Float.parseFloat(equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")));
-					String negative = "";
-					if (calculation < 0) {
-						negative = "_";
-						calculation = Math.abs(calculation);
-					}
-					equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-							+ equation.substring(endNumTwo + 1 + equation.indexOf("-"));
-				}
-			} else if (equation.contains("+")) {
-				String firstHalf = equation.substring(0, equation.indexOf("+"));
-				int startNumOne = 0;
-				if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-					startNumOne = firstHalf.indexOf("+");
-				}
-				if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-					startNumOne = firstHalf.indexOf("-");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("*");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("/");
-				}
-				String secondHalf = equation.substring(equation.indexOf("+") + 1);
-				int endNumTwo = secondHalf.length();
-				if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("+");
-				}
-				if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("-");
-				}
-				if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("*");
-				}
-				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("/");
-				}
-				if (equation.substring(startNumOne, equation.indexOf("+")).contains("_")) {
-					equation.substring(startNumOne, equation.indexOf("+")).replace("_", "-");
-				}
-				if (equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).contains("_")) {
-					equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")).replace("_", "-");
-				}
-				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("+")))
-						+ Float.parseFloat(equation.substring(equation.indexOf("+") + 1, endNumTwo + 1 + equation.indexOf("+")));
-				String negative = "";
-				if (calculation < 0) {
-					negative = "_";
-					calculation = Math.abs(calculation);
-				}
-				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-						+ equation.substring(endNumTwo + 1 + equation.indexOf("+"));
-			} else {
-				String firstHalf = equation.substring(0, equation.indexOf("-"));
-				int startNumOne = 0;
-				if (firstHalf.contains("+") && firstHalf.indexOf("+") > startNumOne) {
-					startNumOne = firstHalf.indexOf("+");
-				}
-				if (firstHalf.contains("-") && firstHalf.indexOf("-") > startNumOne) {
-					startNumOne = firstHalf.indexOf("-");
-				}
-				if (firstHalf.contains("*") && firstHalf.indexOf("*") > startNumOne) {
-					startNumOne = firstHalf.indexOf("*");
-				}
-				if (firstHalf.contains("/") && firstHalf.indexOf("/") > startNumOne) {
-					startNumOne = firstHalf.indexOf("/");
-				}
-				String secondHalf = equation.substring(equation.indexOf("-") + 1);
-				int endNumTwo = secondHalf.length();
-				if (secondHalf.contains("+") && secondHalf.indexOf("+") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("+");
-				}
-				if (secondHalf.contains("-") && secondHalf.indexOf("-") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("-");
-				}
-				if (secondHalf.contains("*") && secondHalf.indexOf("*") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("*");
-				}
-				if (secondHalf.contains("/") && secondHalf.indexOf("/") < endNumTwo) {
-					endNumTwo = secondHalf.indexOf("/");
-				}
-				if (equation.substring(startNumOne, equation.indexOf("-")).contains("_")) {
-					equation.substring(startNumOne, equation.indexOf("-")).replace("_", "-");
-				}
-				if (equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).contains("_")) {
-					equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")).replace("_", "-");
-				}
-				float calculation = Float.parseFloat(equation.substring(startNumOne, equation.indexOf("-")))
-						- Float.parseFloat(equation.substring(equation.indexOf("-") + 1, endNumTwo + 1 + equation.indexOf("-")));
-				String negative = "";
-				if (calculation < 0) {
-					negative = "_";
-					calculation = Math.abs(calculation);
-				}
-				equation = equation.substring(0, startNumOne) + negative + Float.toString(calculation)
-						+ equation.substring(endNumTwo + 1 + equation.indexOf("-"));
-			}
-			equation = calculate(equation);
+	interface Token {
+	}
+
+	class NumberToken implements Token {
+		double value;
+
+		public NumberToken(double d) {
+			this.value = d;
 		}
-		return equation;
+	}
+
+class OperationToken implements Token {
+	String value;
+
+	public OperationToken(String i) {
+		this.value = i;
 	}
 }
