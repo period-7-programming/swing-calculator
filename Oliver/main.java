@@ -46,8 +46,7 @@ public class main extends JFrame {
 				};
 			} else if (i == 14) {
 				listen = new ActionListener() {
-
-	public void actionPerformed(ActionEvent arg0) {
+					public void actionPerformed(ActionEvent arg0) {
 						equationDisplay.setText(
 								equationDisplay.getText().substring(0, equationDisplay.getText().length() - 1));
 					}
@@ -55,55 +54,160 @@ public class main extends JFrame {
 			} else {
 				listen = new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						equationDisplay.setText(calculate(equationDisplay.getText()));
+						if (true) { // will later check if it contains any
+									// unexpected characters
+
+						} else {
+							equationDisplay.setText(
+									Double.toString(calculate(handleGrouping(tokenize(equationDisplay.getText())))));
+						}
 					}
 				};
-			}buttons[i].addActionListener(listen);
-
-	}this.setTitle("Calculator");}
-
-	String calculate(String equation) {
-		String numbers = "0123456789.";
-		String operations = "+-/*";
-		// check if there's other characters HERE
-		if (equation.contains("(")) {
-			String result = calculate(equation.substring(equation.indexOf("(") + 1, equation.lastIndexOf(")")));
-			equation = equation.substring(0, equation.indexOf("(")) + result
-					+ equation.substring(equation.lastIndexOf(")") + 1);
-		}
-		String currentToken = "";
-		boolean lastTokenOperation = false;
-		for (int i = 0; i < equation.length(); i++) {
-			if (numbers.contains(Character.toString(equation.charAt(i)))) {
-				currentToken = currentToken + equation.charAt(i);
-			} else {
-				if (true)// if char is - and last was operation
-				{
-					Token number = new NumberToken(Double.parseDouble((currentToken)));
-					equationParts.add(number);
-					currentToken = Character.toString(equation.charAt(i));
-				} else {
-				}
 			}
-			return equation;
+			buttons[i].addActionListener(listen);
 		}
+		this.setTitle("Calculator");
 	}
 
-	interface Token {
-	}
+	private ArrayList<Token> tokenize(String equation) {
+		ArrayList<Token> tokens = null;
 
-	class NumberToken implements Token {
-		double value;
+		Token currentToken = null;
+		String currentData = null;
 
-		public NumberToken(double d) {
-			this.value = d;
+		for (int i = 0; i < equation.length(); i++) {
+			char current = equation.charAt(i);
+			if (Character.isDigit(current) || current == '.') {
+				if (currentToken instanceof OperationToken || currentToken instanceof GroupingToken) {
+					currentToken.valueFromString(currentData);
+					tokens.add(currentToken);
+					currentToken = new NumberToken();
+					currentData = "";
+				}
+				currentData += Character.toString(current);
+			} else if (Character.toString(current) != "(" || Character.toString(current) != ")") {
+				if (currentToken instanceof OperationToken) {
+					if (Character.toString(current).equals("-")) {
+						currentToken.valueFromString(currentData);
+						tokens.add(currentToken);
+						currentToken = new NumberToken();
+						currentData = "";
+					} else {
+						// if it gets to here that means theres an error due to
+						// something like '3+*4'
+					}
+				} else {
+					currentToken.valueFromString(currentData);
+					tokens.add(currentToken);
+					currentToken = new OperationToken();
+					currentData = "";
+				}
+				currentData += Character.toString(current);
+			} else {
+				currentToken.valueFromString(currentData); // doesn't need to
+															// check what its
+															// currently working
+															// on, as grouping
+															// tokens will
+															// always be
+															// separated into
+															// two if it is
+															// something like ((
+															// or if its working
+															// on a different
+															// type
+				tokens.add(currentToken);
+				currentToken = new GroupingToken();
+				currentData = "";
+				currentData += Character.toString(current);
+			}
 		}
+
+		return tokens;
+
 	}
+
+	private Equation handleGrouping(ArrayList<Token> tokens) {
+		// Find which tokens go together....
+		// Add an "equation token" which groups together other tokens.
+		return null;
+	}
+
+	private double calculate(Equation equation) {
+		// Go through all the tokens in the equation.
+		return 0; // answer;
+	}
+}
+
+interface Token {
+	public void valueFromString(String currentData);
+}
+
+class NumberToken implements Token {
+	private double value;
+
+	public NumberToken(double i) {
+		this.value = i;
+	}
+
+	public NumberToken() {
+
+	}
+
+	public double getValue() {
+		return this.value;
+	}
+
+	@Override
+	public void valueFromString(String currentData) {
+		// Get number from string of data.
+
+	}
+}
+
+// Represents everything inside a parentheses
+class Equation implements Token {
+	private ArrayList<Token> tokens;
+
+	// Initialize at some point.
+
+	public ArrayList<Token> getTokens() {
+		return tokens;
+	}
+
+	@Override
+	public void valueFromString(String currentData) {
+		
+	}
+}
+
+// Represents a simple "parentheses"
+class GroupingToken implements Token {
+
+	@Override
+	public void valueFromString(String currentData) {
+
+	}
+}
 
 class OperationToken implements Token {
-	String value;
+	private String value;
 
 	public OperationToken(String i) {
 		this.value = i;
+	}
+
+	public OperationToken() {
+
+	}
+
+	public String getValue() {
+		return this.value;
+	}
+
+	@Override
+	public void valueFromString(String currentData) {
+		// TODO Auto-generated method stub
+
 	}
 }
