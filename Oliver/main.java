@@ -1,6 +1,5 @@
 package calculator;
 
-//doesn't work with negatives because it takes the negative as an operation and having errors
 import javax.swing.*;
 
 import java.awt.event.ActionEvent;
@@ -53,11 +52,12 @@ public class main extends JFrame {
 			} else {
 				listen = new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						if (true) { // will later check if it only contains valid characters
+						if (true) { // will later check if it only contains
+									// valid characters
 							equationDisplay.setText(
 									Double.toString(calculate(handleGrouping(tokenize(equationDisplay.getText())))));
 						} else {
-							
+
 						}
 					}
 				};
@@ -128,8 +128,20 @@ public class main extends JFrame {
 	private Equation handleGrouping(List<Token> list) {
 		// Find which tokens go together....
 		// Add an "equation token" which groups together other tokens
+		boolean groupings = hasGroupings(list);
+		while (groupings = true) {
+			
+			groupings = hasGroupings(list);
+		}
 		
 		return null;
+	}
+	private boolean hasGroupings(List<Token> list) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i) instanceof GroupingToken){
+				return true;
+			}
+		}
 	}
 
 	private double calculate(Equation equation) {
@@ -176,7 +188,7 @@ class Equation implements Token {
 
 	@Override
 	public void valueFromString(String currentData) {
-		
+
 	}
 }
 
@@ -190,12 +202,12 @@ class GroupingToken implements Token {
 	public GroupingToken() {
 
 	}
-	
+
 	@Override
 	public void valueFromString(String currentData) {
 		this.value = currentData;
 	}
-	
+
 	public String getValue() {
 		return this.value;
 	}
