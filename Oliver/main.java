@@ -3,14 +3,13 @@ package calculator;
 //doesn't work with negatives because it takes the negative as an operation and having errors
 import javax.swing.*;
 
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public class main extends JFrame {
-	ArrayList<Token> equationParts = new ArrayList<Token>();
+	List<Token> equationParts = new ArrayList<Token>();
 	int[] buttonX = { 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147 }; // coordinates
 	int[] buttonY = { 75, 75, 75, 75, 135, 135, 135, 135, 195, 195, 195, 195, 255, 255, 255, 255, 315, 315, 315 };
 	int[] buttonWidth = { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 130 };
@@ -54,12 +53,11 @@ public class main extends JFrame {
 			} else {
 				listen = new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						if (true) { // will later check if it contains any
-									// unexpected characters
-
-						} else {
+						if (true) { // will later check if it only contains valid characters
 							equationDisplay.setText(
 									Double.toString(calculate(handleGrouping(tokenize(equationDisplay.getText())))));
+						} else {
+							
 						}
 					}
 				};
@@ -69,7 +67,7 @@ public class main extends JFrame {
 		this.setTitle("Calculator");
 	}
 
-	private ArrayList<Token> tokenize(String equation) {
+	private List<Token> tokenize(String equation) {
 		ArrayList<Token> tokens = null;
 
 		Token currentToken = null;
@@ -127,9 +125,10 @@ public class main extends JFrame {
 
 	}
 
-	private Equation handleGrouping(ArrayList<Token> tokens) {
+	private Equation handleGrouping(List<Token> list) {
 		// Find which tokens go together....
-		// Add an "equation token" which groups together other tokens.
+		// Add an "equation token" which groups together other tokens
+		
 		return null;
 	}
 
@@ -160,18 +159,18 @@ class NumberToken implements Token {
 
 	@Override
 	public void valueFromString(String currentData) {
-		// Get number from string of data.
+		this.value = Double.parseDouble(currentData);
 
 	}
 }
 
 // Represents everything inside a parentheses
 class Equation implements Token {
-	private ArrayList<Token> tokens;
+	private List<Token> tokens;
 
 	// Initialize at some point.
 
-	public ArrayList<Token> getTokens() {
+	public List<Token> getTokens() {
 		return tokens;
 	}
 
@@ -181,12 +180,24 @@ class Equation implements Token {
 	}
 }
 
-// Represents a simple "parentheses"
 class GroupingToken implements Token {
+	private String value;
 
+	public GroupingToken(String i) {
+		this.value = i;
+	}
+
+	public GroupingToken() {
+
+	}
+	
 	@Override
 	public void valueFromString(String currentData) {
-
+		this.value = currentData;
+	}
+	
+	public String getValue() {
+		return this.value;
 	}
 }
 
@@ -207,7 +218,6 @@ class OperationToken implements Token {
 
 	@Override
 	public void valueFromString(String currentData) {
-		// TODO Auto-generated method stub
-
+		this.value = currentData;
 	}
 }
