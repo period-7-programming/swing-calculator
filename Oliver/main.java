@@ -67,7 +67,7 @@ public class main extends JFrame {
 		this.setTitle("Calculator");
 	}
 
-	private List<Token> tokenize(String equation) {
+	private ArrayList<Token> tokenize(String equation) {
 		ArrayList<Token> tokens = null;
 
 		Token currentToken = null;
@@ -83,7 +83,8 @@ public class main extends JFrame {
 					currentData = "";
 				}
 				currentData += Character.toString(current);
-			} else if (Character.toString(current) != "(" || Character.toString(current) != ")") {
+			} else if (Character.toString(current).equals("(") == false
+					|| Character.toString(current).equals(")") == false) {
 				if (currentToken instanceof OperationToken) {
 					if (Character.toString(current).equals("-")) {
 						currentToken.valueFromString(currentData);
@@ -125,23 +126,30 @@ public class main extends JFrame {
 
 	}
 
-	private Equation handleGrouping(List<Token> list) {
-		// Find which tokens go together....
-		// Add an "equation token" which groups together other tokens
-		boolean groupings = hasGroupings(list);
-		while (groupings = true) {
-			
-			groupings = hasGroupings(list);
+	private Equation handleGrouping(ArrayList<Token> list) {
+		if (hasGroupings(list) == true) {
+			ArrayList<Token> contents = new ArrayList<Token>();
+			for (int i = 1; i < list.lastIndexOf(")"); i++) {
+				contents.add(list.get(list.indexOf("(" + i)));
+			}
+			contents = handleGrouping(contents).getTokens();
+			Equation item = new Equation(contents);
+			for (int i = 1; i <= list.lastIndexOf(")"); i++) {
+				list.remove(i);
+			}
+			list.set(list.indexOf("("), item);
 		}
-		
-		return null;
+		return new Equation(list);
 	}
-	private boolean hasGroupings(List<Token> list) {
+
+	private boolean hasGroupings(ArrayList<Token> list) {
+		boolean answer = false;
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i) instanceof GroupingToken){
-				return true;
+			if (list.get(i) instanceof GroupingToken) {
+				answer = true;
 			}
 		}
+		return answer;
 	}
 
 	private double calculate(Equation equation) {
@@ -178,17 +186,21 @@ class NumberToken implements Token {
 
 // Represents everything inside a parentheses
 class Equation implements Token {
-	private List<Token> tokens;
+	private List<Token> tokens = new ArrayList<Token>();
 
-	// Initialize at some point.
+	public Equation(ArrayList<Token> temp) {
+		tokens = temp; // I think I remember about this not working as I intend
+		// but I may be wrong. Something about changes to temp
+		// affecting tokens as it isn't making a copy but just
+		// points to the old one. If so I'll fix it later
+	}
 
-	public List<Token> getTokens() {
-		return tokens;
+	public ArrayList<Token> getTokens() {
+		return (ArrayList<Token>) tokens;
 	}
 
 	@Override
 	public void valueFromString(String currentData) {
-
 	}
 }
 
