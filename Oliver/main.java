@@ -55,7 +55,7 @@ public class main extends JFrame {
 						if (true) { // will later check if it only contains
 									// valid characters
 							equationDisplay.setText(
-									Double.toString(calculate(handleGrouping(tokenize(equationDisplay.getText())))));
+									(calculate(handleGrouping(tokenize(equationDisplay.getText())))).get(0).toString());
 						} else {
 
 						}
@@ -76,28 +76,37 @@ public class main extends JFrame {
 		for (int i = 0; i < equation.length(); i++) {
 			char current = equation.charAt(i);
 			if (Character.isDigit(current) || current == '.') {
-				if (currentToken instanceof OperationToken || currentToken instanceof GroupingToken) {
-					currentToken.valueFromString(currentData);
-					tokens.add(currentToken);
-					currentToken = new NumberToken();
-					currentData = "";
+				if (currentToken instanceof NumberToken == false) {
+					if (currentToken != null) {
+						if (currentToken instanceof OperationToken) {
+							tokens.add(new OperationToken(currentData));
+						} else {
+							tokens.add(new GroupingToken(currentData));
+						}
+						currentToken = new NumberToken();
+						currentData = "";
+					} else {
+						currentToken = new NumberToken();
+						currentData = "";
+					}
 				}
 				currentData += Character.toString(current);
 			} else if (Character.toString(current).equals("(") == false
 					|| Character.toString(current).equals(")") == false) {
 				if (currentToken instanceof OperationToken) {
 					if (Character.toString(current).equals("-")) {
-						currentToken.valueFromString(currentData);
-						tokens.add(currentToken);
+						tokens.add(new OperationToken(currentData));
 						currentToken = new NumberToken();
 						currentData = "";
 					} else {
 						// if it gets to here that means theres an error due to
 						// something like '3+*4'
 					}
+				} else if (currentToken == null) {
+					currentToken = new NumberToken();
+					currentData = "";
 				} else {
-					currentToken.valueFromString(currentData);
-					tokens.add(currentToken);
+					tokens.add(new NumberToken(Double.parseDouble(currentData)));
 					currentToken = new OperationToken();
 					currentData = "";
 				}
@@ -152,9 +161,49 @@ public class main extends JFrame {
 		return answer;
 	}
 
-	private double calculate(Equation equation) {
-		// Go through all the tokens in the equation.
-		return 0; // answer;
+	private ArrayList<Token> calculate(Equation equation) {
+		ArrayList<Token> tokens = new ArrayList<Token>();
+		tokens = equation.getTokens();
+		int doFirst = 0; // 0 none, 1 add/sub, 2 mult/div, 3 equation
+		int locOfNext = 0;
+		for (int i = 0; i < tokens.size(); i++) {
+			if (tokens.get(i) instanceof Equation) {
+				doFirst = 3;
+				locOfNext = i;
+			} else if (tokens.get(i) instanceof OperationToken) {
+				if (tokens.get(i).toString().equals("*") || tokens.get(i).toString().equals("/")) {
+					if (doFirst < 2) {
+						doFirst = 2;
+						locOfNext = i;
+					}
+				} else {
+					if (doFirst < 1) {
+						doFirst = 1;
+					}
+				}
+			}
+		}
+		if (doFirst != 3) {
+			tokens.set(locOfNext-1, new NumberToken(preformOperation(Double.parseDouble(tokens.get(locOfNext-1).toString()),
+					Double.parseDouble(tokens.get(locOfNext + 1).toString()), tokens.get(locOfNext).toString())));
+			tokens.remove(locOfNext);
+			tokens.remove(locOfNext + 1);
+		} else {
+			tokens.set(locOfNext, new Equation(calculate((Equation) tokens.get(locOfNext))));
+		}
+		return tokens;
+	}
+
+	private double preformOperation(double a, double b, String operation) {
+		if (operation.equals("*")) {
+			return a * b;
+		} else if (operation.equals("/")) {
+			return a / b;
+		} else if (operation.equals("+")) {
+			return a + b;
+		} else {
+			return a - b;
+		}
 	}
 }
 
@@ -184,7 +233,6 @@ class NumberToken implements Token {
 	}
 }
 
-// Represents everything inside a parentheses
 class Equation implements Token {
 	private List<Token> tokens = new ArrayList<Token>();
 
@@ -193,6 +241,7 @@ class Equation implements Token {
 		// but I may be wrong. Something about changes to temp
 		// affecting tokens as it isn't making a copy but just
 		// points to the old one. If so I'll fix it later
+		// EDIT: I think it should actually work but maybe not
 	}
 
 	public ArrayList<Token> getTokens() {
