@@ -54,8 +54,9 @@ public class main extends JFrame {
 					public void actionPerformed(ActionEvent arg0) {
 						if (true) { // will later check if it only contains
 									// valid characters
-							equationDisplay.setText(
-									(calculate(handleGrouping(tokenize(equationDisplay.getText())))).get(0).toString());
+							equationDisplay.setText((Double.toString(
+									((NumberToken) (calculate(handleGrouping(tokenize(equationDisplay.getText()))))
+											.get(0)).getValue())));
 						} else {
 
 						}
@@ -68,10 +69,10 @@ public class main extends JFrame {
 	}
 
 	private ArrayList<Token> tokenize(String equation) {
-		ArrayList<Token> tokens = null;
+		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		Token currentToken = null;
-		String currentData = null;
+		String currentData = "";
 
 		for (int i = 0; i < equation.length(); i++) {
 			char current = equation.charAt(i);
@@ -130,7 +131,8 @@ public class main extends JFrame {
 				currentData += Character.toString(current);
 			}
 		}
-
+		currentToken.valueFromString(currentData);
+		tokens.add(currentToken);
 		return tokens;
 
 	}
@@ -167,28 +169,30 @@ public class main extends JFrame {
 		int doFirst = 0; // 0 none, 1 add/sub, 2 mult/div, 3 equation
 		int locOfNext = 0;
 		for (int i = 0; i < tokens.size(); i++) {
-			if (tokens.get(i) instanceof Equation) {
+			if (tokens.get(i) instanceof Equation && doFirst != 3) {
 				doFirst = 3;
 				locOfNext = i;
 			} else if (tokens.get(i) instanceof OperationToken) {
-				if (tokens.get(i).toString().equals("*") || tokens.get(i).toString().equals("/")) {
+				if ((tokens.get(i).toString().equals("*") || tokens.get(i).toString().equals("/")) && doFirst < 2) {
 					if (doFirst < 2) {
 						doFirst = 2;
 						locOfNext = i;
 					}
-				} else {
+				} else if (doFirst == 0) {
 					if (doFirst < 1) {
 						doFirst = 1;
 					}
 				}
 			}
 		}
-		if (doFirst != 3) {
-			tokens.set(locOfNext-1, new NumberToken(preformOperation(Double.parseDouble(tokens.get(locOfNext-1).toString()),
-					Double.parseDouble(tokens.get(locOfNext + 1).toString()), tokens.get(locOfNext).toString())));
+		if (doFirst != 3 && doFirst != 0) {
+			tokens.set(locOfNext - 1,
+					new NumberToken(preformOperation(Double.parseDouble(tokens.get(locOfNext - 1).toString()),
+							Double.parseDouble(tokens.get(locOfNext + 1).toString()),
+							tokens.get(locOfNext).toString())));
 			tokens.remove(locOfNext);
 			tokens.remove(locOfNext + 1);
-		} else {
+		} else if (doFirst == 3) {
 			tokens.set(locOfNext, new Equation(calculate((Equation) tokens.get(locOfNext))));
 		}
 		return tokens;
