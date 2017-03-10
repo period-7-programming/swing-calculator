@@ -54,9 +54,9 @@ public class main extends JFrame {
 					public void actionPerformed(ActionEvent arg0) {
 						if (true) { // will later check if it only contains
 									// valid characters
-							equationDisplay.setText((Double.toString(
-									((NumberToken) (calculate(handleGrouping(tokenize(equationDisplay.getText()))))
-											.get(0)).getValue())));
+							equationDisplay.setText(
+									(((NumberToken) (calculate(handleGrouping(tokenize(equationDisplay.getText()))))
+											.get(0)).getValue()));
 						} else {
 
 						}
@@ -93,7 +93,7 @@ public class main extends JFrame {
 				}
 				currentData += Character.toString(current);
 			} else if (Character.toString(current).equals("(") == false
-					|| Character.toString(current).equals(")") == false) {
+					&& Character.toString(current).equals(")") == false) {
 				if (currentToken instanceof OperationToken) {
 					if (Character.toString(current).equals("-")) {
 						tokens.add(new OperationToken(currentData));
@@ -104,7 +104,16 @@ public class main extends JFrame {
 						// something like '3+*4'
 					}
 				} else if (currentToken == null) {
-					currentToken = new NumberToken();
+					if (Character.isDigit(current) || current == '.') {
+						currentToken = new NumberToken();
+					} else if (current == ')' || current == '(') {
+						currentToken = new GroupingToken();
+					} else {
+						// Error: starts with operation or other
+					}
+				} else if (currentToken instanceof GroupingToken) { 
+					tokens.add(new GroupingToken(currentData));
+					currentToken = new OperationToken();
 					currentData = "";
 				} else {
 					tokens.add(new NumberToken(Double.parseDouble(currentData)));
@@ -113,19 +122,13 @@ public class main extends JFrame {
 				}
 				currentData += Character.toString(current);
 			} else {
-				currentToken.valueFromString(currentData); // doesn't need to
-															// check what its
-															// currently working
-															// on, as grouping
-															// tokens will
-															// always be
-															// separated into
-															// two if it is
-															// something like ((
-															// or if its working
-															// on a different
-															// type
-				tokens.add(currentToken);
+				if (currentToken instanceof GroupingToken) {
+					tokens.add(new GroupingToken(currentData));
+				} else if (currentToken instanceof OperationToken) {
+					tokens.add(new OperationToken(currentData));
+				} else if (currentToken instanceof NumberToken) {
+					tokens.add(new NumberToken(Double.parseDouble(currentData)));
+				}
 				currentToken = new GroupingToken();
 				currentData = "";
 				currentData += Character.toString(current);
@@ -133,6 +136,22 @@ public class main extends JFrame {
 		}
 		currentToken.valueFromString(currentData);
 		tokens.add(currentToken);
+		
+		for (i=0;i< tokens.size(); i++) {
+			Token a = (Token) tokens.get(i);
+			if (a instanceof NumberToken) {
+				a = (NumberToken) tokens.get(i);
+				System.out.println(((NumberToken) a).getValue());
+			} else if (a instanceof GroupingToken) {
+				a = (GroupingToken) tokens.get(i);
+				System.out.println(((GroupingToken) a).getValue());
+			} else if (a instanceof OperationToken) {
+				a = (OperationToken) tokens.get(i);
+				System.out.println(((OperationToken) a).getValue());
+			}
+		}
+		System.out.println();
+		
 		return tokens;
 
 	}
@@ -140,15 +159,19 @@ public class main extends JFrame {
 	private Equation handleGrouping(ArrayList<Token> list) {
 		if (hasGroupings(list) == true) {
 			ArrayList<Token> contents = new ArrayList<Token>();
-			for (int i = 1; i < list.lastIndexOf(")"); i++) {
-				contents.add(list.get(list.indexOf("(" + i)));
+			ArrayList<String> listAsStrings = new ArrayList<String>();
+			for (int e = 0; e < list.size(); e++) {
+				listAsStrings.add(list.get(e).getValue());
+			}
+			for (int i = 1; i < listAsStrings.lastIndexOf(")")-listAsStrings.indexOf("("); i++) {
+				contents.add(list.get(listAsStrings.indexOf("(") + i));
+			}
+			for (int i = listAsStrings.indexOf("("); i <= listAsStrings.lastIndexOf(""); i++) {
+				contents.remove(i);
 			}
 			contents = handleGrouping(contents).getTokens();
 			Equation item = new Equation(contents);
-			for (int i = 1; i <= list.lastIndexOf(")"); i++) {
-				list.remove(i);
-			}
-			list.set(list.indexOf("("), item);
+			list.add(item);
 		}
 		return new Equation(list);
 	}
@@ -173,7 +196,8 @@ public class main extends JFrame {
 				doFirst = 3;
 				locOfNext = i;
 			} else if (tokens.get(i) instanceof OperationToken) {
-				if ((tokens.get(i).toString().equals("*") || tokens.get(i).toString().equals("/")) && doFirst < 2) {
+				if ((((OperationToken) tokens.get(i)).getValue().equals("*")
+						|| ((OperationToken) tokens.get(i)).getValue().equals("/")) && doFirst < 2) {
 					if (doFirst < 2) {
 						doFirst = 2;
 						locOfNext = i;
@@ -181,20 +205,59 @@ public class main extends JFrame {
 				} else if (doFirst == 0) {
 					if (doFirst < 1) {
 						doFirst = 1;
+						locOfNext = i;
 					}
 				}
 			}
 		}
 		if (doFirst != 3 && doFirst != 0) {
 			tokens.set(locOfNext - 1,
-					new NumberToken(preformOperation(Double.parseDouble(tokens.get(locOfNext - 1).toString()),
-							Double.parseDouble(tokens.get(locOfNext + 1).toString()),
-							tokens.get(locOfNext).toString())));
+					new NumberToken(
+							preformOperation(Double.parseDouble(((NumberToken) tokens.get(locOfNext - 1)).getValue()),
+									Double.parseDouble(((NumberToken) tokens.get(locOfNext + 1)).getValue()),
+									((OperationToken) tokens.get(locOfNext)).getValue())));
 			tokens.remove(locOfNext);
-			tokens.remove(locOfNext + 1);
+			tokens.remove(locOfNext);
+			
+			for (i=0;i< tokens.size(); i++) {
+				Token a = (Token) tokens.get(i);
+				if (a instanceof NumberToken) {
+					a = (NumberToken) tokens.get(i);
+					System.out.println(((NumberToken) a).getValue());
+				} else if (a instanceof GroupingToken) {
+					a = (GroupingToken) tokens.get(i);
+					System.out.println(((GroupingToken) a).getValue());
+				} else if (a instanceof OperationToken) {
+					a = (OperationToken) tokens.get(i);
+					System.out.println(((OperationToken) a).getValue());
+				}
+			}
+			System.out.println();
+			
+			ArrayList<Token> temp = calculate(new Equation(tokens));
+			tokens = temp;
 		} else if (doFirst == 3) {
-			tokens.set(locOfNext, new Equation(calculate((Equation) tokens.get(locOfNext))));
+			tokens.set(locOfNext, calculate(((Equation) tokens.get(locOfNext))).get(0));
+			
+			for (i=0;i< tokens.size(); i++) {
+				Token a = (Token) tokens.get(i);
+				if (a instanceof NumberToken) {
+					a = (NumberToken) tokens.get(i);
+					System.out.println(((NumberToken) a).getValue());
+				} else if (a instanceof GroupingToken) {
+					a = (GroupingToken) tokens.get(i);
+					System.out.println(((GroupingToken) a).getValue());
+				} else if (a instanceof OperationToken) {
+					a = (OperationToken) tokens.get(i);
+					System.out.println(((OperationToken) a).getValue());
+				}
+			}
+			System.out.println();
+			
+			ArrayList<Token> temp = calculate(handleGrouping(tokens));
+			tokens = temp;
 		}
+		
 		return tokens;
 	}
 
@@ -205,14 +268,19 @@ public class main extends JFrame {
 			return a / b;
 		} else if (operation.equals("+")) {
 			return a + b;
-		} else {
+		} else if (operation.equals("-")) {
 			return a - b;
+		} else {
+			System.out.println("Error @ preformOperation");
+			return 0;
 		}
 	}
 }
 
 interface Token {
 	public void valueFromString(String currentData);
+
+	public String getValue();
 }
 
 class NumberToken implements Token {
@@ -226,8 +294,9 @@ class NumberToken implements Token {
 
 	}
 
-	public double getValue() {
-		return this.value;
+	@Override
+	public String getValue() {
+		return Double.toString(this.value);
 	}
 
 	@Override
@@ -255,6 +324,12 @@ class Equation implements Token {
 	@Override
 	public void valueFromString(String currentData) {
 	}
+
+	@Override
+	public String getValue() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
 
 class GroupingToken implements Token {
@@ -273,6 +348,7 @@ class GroupingToken implements Token {
 		this.value = currentData;
 	}
 
+	@Override
 	public String getValue() {
 		return this.value;
 	}
@@ -289,6 +365,7 @@ class OperationToken implements Token {
 
 	}
 
+	@Override
 	public String getValue() {
 		return this.value;
 	}
