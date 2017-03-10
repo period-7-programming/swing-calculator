@@ -83,8 +83,10 @@ public class main extends JFrame {
 					currentData = "";
 				}
 				currentData += Character.toString(current);
+				
 			} else if (Character.toString(current).equals("(") == false
 					|| Character.toString(current).equals(")") == false) {
+				
 				if (currentToken instanceof OperationToken) {
 					if (Character.toString(current).equals("-")) {
 						currentToken.valueFromString(currentData);
@@ -121,7 +123,7 @@ public class main extends JFrame {
 				currentData += Character.toString(current);
 			}
 		}
-
+		
 		return tokens;
 
 	}
@@ -179,8 +181,7 @@ class NumberToken implements Token {
 
 	@Override
 	public void valueFromString(String currentData) {
-		this.value = Double.parseDouble(currentData);
-
+		this.value = Double.parseDouble(currentData); 
 	}
 }
 
@@ -201,6 +202,7 @@ class Equation implements Token {
 
 	@Override
 	public void valueFromString(String currentData) {
+		
 	}
 }
 

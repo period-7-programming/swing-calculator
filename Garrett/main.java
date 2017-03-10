@@ -12,24 +12,25 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-public class main extends JFrame {
+public class Main extends JFrame {
 	ArrayList<Token> equationParts = new ArrayList<Token>();
 	int[] buttonX = { 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147 }; // coordinates
 	int[] buttonY = { 75, 75, 75, 75, 135, 135, 135, 135, 195, 195, 195, 195, 255, 255, 255, 255, 315, 315, 315 };
 	int[] buttonWidth = { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 130 };
-	String[] buttonText = { "1", "2", "3", "*", "4", "5", "6", "/", "7", "8", "9", "+", ".", "0", "\u232b", "-", "(",
-			")", "=", }; // defines button text
+	String[] buttonText = { "1", "2", "3", "*", "4", "5", "6", "/", "7", "8", "9", "+", ".", "0", "Del", "-", "(", ")",
+			"=", }; // defines button text
 	int i;
 	JButton buttons[] = new JButton[19];
 
 	public static void main(String[] args) {
-		main w = new main();
+		Main w = new Main();
 		w.setVisible(true);
 	}
 
-	public main() {
+	public Main() {
 		super();
 		this.setSize(300, 400);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getContentPane().setLayout(null);
 		JTextField equationDisplay = new JTextField();
 		equationDisplay.setBounds(7, 7, 270, 61);
@@ -57,11 +58,12 @@ public class main extends JFrame {
 				};
 			} else {
 				listen = new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						// equationDisplay.setText(calculate(equationDisplay.getText()));
+					public void actionPerformed(ActionEvent arg0) { // enter key
 
-						// calculate(handleGrouping(tokenize(equationDisplay.getText())));
-						System.out.println(tokenize(equationDisplay.getText()));
+						System.out.println(solve(tokenize(equationDisplay.getText()))); // get
+																						// grouping
+																						// to
+																						// work
 					}
 				};
 			}
@@ -71,156 +73,96 @@ public class main extends JFrame {
 		this.setTitle("Calculator");
 	}
 
+	private double solve(ArrayList<Token> tokens) {
+
+		for (int i = 0; i > tokens.size(); i--) {
+
+			if (tokens.get(i) instanceof OperationToken) {
+				OperationToken currentToken = (OperationToken) tokens.get(i);
+				if (currentToken.getValue().contains("+")) {
+					System.out.println("In Add");
+					NumberToken a = (NumberToken) tokens.get(i - 1);
+					NumberToken b = (NumberToken) tokens.get(i + 1);
+					System.out.println(a.getValue());
+					System.out.println(b.getValue());
+
+					tokens.set(i - 1, new NumberToken(Double.toString(a.getValue() + b.getValue())));
+
+					tokens.remove(i);
+					tokens.remove(i + 1);
+
+				}
+
+			}
+
+		}
+		for (i = 0; i < tokens.size(); i++) {
+			Token a = (Token) tokens.get(i);
+			if (a instanceof NumberToken) {
+				a = (NumberToken) tokens.get(i);
+				System.out.print("[" + ((NumberToken) a).getValue() + "] ");
+			} else if (a instanceof OperationToken) {
+				a = (OperationToken) tokens.get(i);
+				System.out.print("[" + ((OperationToken) a).getValue() + "] ");
+			} else {
+				a = (OperationToken) tokens.get(i);
+				System.out.print("[" + ((GroupingToken) a).getValue() + "] ");
+			}
+		}
+		System.out.println();
+		NumberToken c = (NumberToken) tokens.get(0);
+		return c.getValue();
+	}
+
 	private ArrayList<Token> tokenize(String equation) { // go through string
 															// equation and make
 															// it into tokens
-		ArrayList<Token> tokens = null;
+		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		String operands = "+-*/";
 		String numbers = "0123456789"; // this might have to include an _ for
-										// negitive numbers
-		String lastToken = ""; // use for negiive check later
-		String currentToken = "";
 
-		for (int i = 0; i < equation.length() - 1; i++) {
-			String currentIndex = Character.toString(equation.charAt(i));
-			if (operands.contains(currentIndex)) {
-				tokens.add(new NumberToken(Float.parseFloat(currentToken)));
-				tokens.add(new OperationToken(currentIndex));
+		String currentData = "";
+
+		for (int i = 0; i < equation.length(); i++) {
+			String current = Character.toString(equation.charAt(i));
+			if (numbers.contains(current) || current.equals(".")) {
+				currentData += current;
 			}
-			if (numbers.contains(currentIndex) || currentIndex == (".")) {
-				currentToken += currentIndex;
+			if (operands.contains(current)) {
+				tokens.add(new NumberToken(currentData));
+				tokens.add(new OperationToken(current));
+				currentData = "";
+			}
+			if (current.equals("(") || current.equals(")")) {
+				tokens.add(new NumberToken(currentData));
+				tokens.add(new GroupingToken(current));
+				currentData = "";
+			}
+
+			// tokenization ^^
+
+		}
+		if (currentData != "") {
+			tokens.add(new NumberToken(currentData));
+		}
+
+		// to display the arrayList
+		for (i = 0; i < tokens.size(); i++) {
+			Token a = (Token) tokens.get(i);
+			if (a instanceof NumberToken) {
+				a = (NumberToken) tokens.get(i);
+				System.out.print("[" + ((NumberToken) a).getValue() + "] ");
+			} else if (a instanceof OperationToken) {
+				a = (OperationToken) tokens.get(i);
+				System.out.print("[" + ((OperationToken) a).getValue() + "] ");
+			} else {
+				a = (OperationToken) tokens.get(i);
+				System.out.print("[" + ((GroupingToken) a).getValue() + "] ");
 			}
 		}
+		System.out.println();
 		return tokens;
 	}
 
-	/*
-	 * // This is the basic idea. private List<Token> tokenize(String equation)
-	 * List<Token> tokens = null;
-	 * 
-	 * Token currentToken = null; String currentData = null;
-	 * 
-	 * for (int i = 0; i < equation.length(); i++) { char current =
-	 * equation.charAt(i);
-	 * 
-	 * // The concept is thus:
-	 * 
-	 * // 1. The current character is different than what the current token //
-	 * should be. // EX: currentToken is a Number // EX: and currentData =
-	 * 1.93234 // if the new 'current' char is '+' we should assume the number
-	 * // token is done.
-	 * 
-	 * // 2. Then we create the token and put it in a list of tokens.
-	 * 
-	 * if (Character.isDigit(current) || current == '.') { if (currentToken
-	 * instanceof OperationToken || currentToken instanceof GroupingToken) {
-	 * currentToken.valueFromString(currentData); tokens.add(currentToken);
-	 * currentToken = new NumberToken(); currentData = ""; } currentData +=
-	 * Character.toString(current); }
-	 * 
-	 * if (true) { // Current digit is an operator // Last token was an operator
-	 * if (tokens.get(tokens.size() - 1) instanceof OperationToken) { // Handle
-	 * minus sign here. } else if (currentToken instanceof NumberToken ||
-	 * currentToken instanceof GroupingToken) {
-	 * currentToken.valueFromString(currentData); tokens.add(currentToken);
-	 * currentToken = new OperationToken(); currentData = ""; } currentData +=
-	 * Character.toString(current); }
-	 * 
-	 * if (true) { // Current digit is grouping token if (currentToken
-	 * instanceof NumberToken || currentToken instanceof OperationToken) {
-	 * currentToken.valueFromString(currentData); tokens.add(currentToken);
-	 * currentToken = new GroupingToken(); currentData = ""; } currentData +=
-	 * Character.toString(current); } }
-	 * 
-	 * return tokens;
-	 * 
-	 * }
-	 */
-
-	private Equation handleGrouping(List<Token> tokens) {
-		// Find which tokens go together....
-		// Add an "equation token" which groups together other tokens.
-		return null;
-	}
-
-	private double calculate(Equation equation) {
-		// Go through all the tokens in the equation.
-		return 0; // answer;
-	}
-}
-
-interface Token {
-	public void valueFromString(String currentData);
-}
-
-class NumberToken implements Token {
-	private double value;
-
-	public NumberToken(double i) {
-		this.value = i;
-	}
-
-	public NumberToken() {
-
-	}
-
-	public double getValue() {
-		return this.value;
-	}
-
-	@Override
-	public void valueFromString(String currentData) {
-		// Get number from string of data.
-
-	}
-}
-
-// Represents everything inside a parentheses
-class Equation implements Token {
-	private List<Token> tokens;
-
-	// Initialize at some point.
-
-	public List<Token> getTokens() {
-		return tokens;
-	}
-
-	@Override
-	public void valueFromString(String currentData) {
-		// TODO Auto-generated method stub
-
-	}
-}
-
-// Represents a simple "parentheses"
-class GroupingToken implements Token {
-
-	@Override
-	public void valueFromString(String currentData) {
-		// TODO Auto-generated method stub
-
-	}
-}
-
-class OperationToken implements Token {
-	private String value;
-
-	public OperationToken(String i) {
-		this.value = i;
-	}
-
-	public OperationToken() {
-
-	}
-
-	public String getValue() {
-		return this.value;
-	}
-
-	@Override
-	public void valueFromString(String currentData) {
-		// TODO Auto-generated method stub
-
-	}
 }
