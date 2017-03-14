@@ -1,5 +1,3 @@
-// COMMENT: Before submitting "ctrl-shift-f" will format the code so it looks nice...
-
 package calculator;
 
 import java.awt.event.ActionEvent;
@@ -7,14 +5,13 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-//doesn't work with negatives because it takes the negative as an operation and having errors
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 public class Main extends JFrame {
 	ArrayList<Token> equationParts = new ArrayList<Token>();
-	int[] buttonX = { 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147 }; // coordinates
+	int[] buttonX = { 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147, 217, 7, 77, 147 };
 	int[] buttonY = { 75, 75, 75, 75, 135, 135, 135, 135, 195, 195, 195, 195, 255, 255, 255, 255, 315, 315, 315 };
 	int[] buttonWidth = { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 130 };
 	String[] buttonText = { "1", "2", "3", "*", "4", "5", "6", "/", "7", "8", "9", "+", ".", "0", "Del", "-", "(", ")",
@@ -59,11 +56,12 @@ public class Main extends JFrame {
 			} else {
 				listen = new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) { // enter key
-
-						System.out.println(solve(tokenize(equationDisplay.getText()))); // get
-																						// grouping
-																						// to
-																						// work
+						List tokens = new ArrayList<Token>();
+						tokens = solve(tokenize(equationDisplay.getText()));
+						NumberToken t = new NumberToken();
+						t = (NumberToken) tokens.get(0);
+						System.out.println(t.getValue());
+						equationDisplay.setText(Double.toString(t.getValue()));
 					}
 				};
 			}
@@ -73,28 +71,104 @@ public class Main extends JFrame {
 		this.setTitle("Calculator");
 	}
 
-	private double solve(ArrayList<Token> tokens) {
+	private List<Token> handleGrouping(List<Token> tokens) {
 
-		for (int i = 0; i > tokens.size(); i--) {
+		int GroupingFirstIndex = 0;
+		int GroupingLastIndex = 0;
+		boolean closeIndex = false;
 
-			if (tokens.get(i) instanceof OperationToken) {
-				OperationToken currentToken = (OperationToken) tokens.get(i);
-				if (currentToken.getValue().contains("+")) {
-					System.out.println("In Add");
-					NumberToken a = (NumberToken) tokens.get(i - 1);
-					NumberToken b = (NumberToken) tokens.get(i + 1);
-					System.out.println(a.getValue());
-					System.out.println(b.getValue());
+		for (int i = 0; i < tokens.size(); i++) {
+			Token t = (Token) tokens.get(i);
+			if (t instanceof GroupingToken) {
 
-					tokens.set(i - 1, new NumberToken(Double.toString(a.getValue() + b.getValue())));
-
-					tokens.remove(i);
-					tokens.remove(i + 1);
-
+				t = (GroupingToken) tokens.get(i);
+				if (((GroupingToken) t).getValue().equals("(")) {
+					GroupingFirstIndex = i;
 				}
 
+				if (((GroupingToken) t).getValue().equals(")") && closeIndex == false) {
+					GroupingLastIndex = i;
+					closeIndex = true;
+				}
 			}
+		}
+		
 
+		List<Token> t = tokens.subList(GroupingFirstIndex+1, GroupingLastIndex); // copy stuff before then get solve(t) then everything after
+
+		tokens.set(GroupingFirstIndex, solve(t).get(0)); // replaces parantheses with solved expression
+		
+		//for (int i = GroupingFirstIndex; i < GroupingLastIndex-1; i++) {
+		//	tokens.remove(GroupingFirstIndex);
+		//}
+		
+		for (i = 0; i < tokens.size(); i++) {
+			Token a = (Token) tokens.get(i);
+			if (a instanceof NumberToken) {
+				a = (NumberToken) tokens.get(i);
+				System.out.print("[" + ((NumberToken) a).getValue() + "] ");
+			} else if (a instanceof OperationToken) {
+				a = (OperationToken) tokens.get(i);
+				System.out.print("[" + ((OperationToken) a).getValue() + "] ");
+			} else {
+				a = (GroupingToken) tokens.get(i);
+				System.out.print("[" + ((GroupingToken) a).getValue() + "] ");
+			}
+		}
+		
+		return tokens;
+	}
+
+	private List<Token> solve(List<Token> tokens) {
+
+		boolean hasGrouping = false;
+
+		for (int i = 0; i < tokens.size(); i++) {
+			Token t = (Token) tokens.get(i);
+			if (t instanceof GroupingToken) {
+				hasGrouping = true;
+			}
+		}
+		if (hasGrouping) {
+			tokens = handleGrouping(tokens);
+		}
+
+		//solves equation need order of operations
+		System.out.println("in solve");
+
+		for (int i = tokens.size() - 1; i > 0; i--) {
+
+			System.out.println("in loop");
+			Token T = (Token) tokens.get(i);
+
+			if (T instanceof OperationToken) {
+				OperationToken currentToken = (OperationToken) tokens.get(i);
+				System.out.println(currentToken.getValue());
+				NumberToken a = (NumberToken) tokens.get(i - 1);
+				NumberToken b = (NumberToken) tokens.get(i + 1);
+				if (currentToken.getValue().contains("+")) {
+					tokens.set(i - 1, new NumberToken(Double.toString(a.getValue() + b.getValue())));
+					tokens.remove(i);
+					tokens.remove(i);
+				}
+
+				if (currentToken.getValue().contains("-")) {// get sub working
+					tokens.set(i - 1, new NumberToken(Double.toString(a.getValue() - b.getValue())));
+					tokens.remove(i);
+					tokens.remove(i);
+				}
+				if (currentToken.getValue().contains("*")) { // get Mult working
+					tokens.set(i - 1, new NumberToken(Double.toString(a.getValue() * b.getValue())));
+					tokens.remove(i);
+					tokens.remove(i);
+				}
+				if (currentToken.getValue().contains("/")) {// get divide
+															// working
+					tokens.set(i - 1, new NumberToken(Double.toString(a.getValue() / b.getValue())));
+					tokens.remove(i);
+					tokens.remove(i);
+				}
+			}
 		}
 		for (i = 0; i < tokens.size(); i++) {
 			Token a = (Token) tokens.get(i);
@@ -105,29 +179,35 @@ public class Main extends JFrame {
 				a = (OperationToken) tokens.get(i);
 				System.out.print("[" + ((OperationToken) a).getValue() + "] ");
 			} else {
-				a = (OperationToken) tokens.get(i);
+				a = (GroupingToken) tokens.get(i);
 				System.out.print("[" + ((GroupingToken) a).getValue() + "] ");
 			}
 		}
 		System.out.println();
 		NumberToken c = (NumberToken) tokens.get(0);
-		return c.getValue();
+		tokens.clear();
+		tokens.add(c);
+		return tokens;
 	}
 
-	private ArrayList<Token> tokenize(String equation) { // go through string
+	private List<Token> tokenize(String equation) { // go through string
 															// equation and make
 															// it into tokens
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		String operands = "+-*/";
-		String numbers = "0123456789"; // this might have to include an _ for
+		String numbers = "0123456789_"; // this might have to include an _ for
 
 		String currentData = "";
 
 		for (int i = 0; i < equation.length(); i++) {
 			String current = Character.toString(equation.charAt(i));
 			if (numbers.contains(current) || current.equals(".")) {
-				currentData += current;
+				if (current.equals("_")) {
+					currentData += "-";
+				} else {
+					currentData += current;
+				}
 			}
 			if (operands.contains(current)) {
 				tokens.add(new NumberToken(currentData));
@@ -135,7 +215,9 @@ public class Main extends JFrame {
 				currentData = "";
 			}
 			if (current.equals("(") || current.equals(")")) {
+				if (currentData != ""){
 				tokens.add(new NumberToken(currentData));
+				}
 				tokens.add(new GroupingToken(current));
 				currentData = "";
 			}
@@ -157,7 +239,7 @@ public class Main extends JFrame {
 				a = (OperationToken) tokens.get(i);
 				System.out.print("[" + ((OperationToken) a).getValue() + "] ");
 			} else {
-				a = (OperationToken) tokens.get(i);
+				a = (GroupingToken) tokens.get(i);
 				System.out.print("[" + ((GroupingToken) a).getValue() + "] ");
 			}
 		}
