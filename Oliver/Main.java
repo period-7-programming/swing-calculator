@@ -161,9 +161,11 @@ public class main extends JFrame {
 			}
 			list.remove(listAsStrings.subList(listAsStrings.lastIndexOf("("), listAsStrings.size()).indexOf(")")
 					+ listAsStrings.lastIndexOf("("));
-			listAsStrings.remove(listAsStrings.lastIndexOf("("));
 			Equation item = new Equation(contents);
-			list.set(listAsStrings.indexOf(")"), item);
+			list.set(listAsStrings.subList(listAsStrings.lastIndexOf("(")
+					, listAsStrings.size()).indexOf(")") 
+					+ listAsStrings.lastIndexOf("(") - 1, item);
+			listAsStrings.remove(listAsStrings.lastIndexOf("("));
 		}
 		return new Equation(list);
 	}
