@@ -111,7 +111,7 @@ public class main extends JFrame {
 					} else {
 						// Error: starts with operation or other
 					}
-				} else if (currentToken instanceof GroupingToken) { 
+				} else if (currentToken instanceof GroupingToken) {
 					tokens.add(new GroupingToken(currentData));
 					currentToken = new OperationToken();
 					currentData = "";
@@ -129,6 +129,11 @@ public class main extends JFrame {
 				} else if (currentToken instanceof NumberToken) {
 					tokens.add(new NumberToken(Double.parseDouble(currentData)));
 				}
+				if (tokens.size() > 0) {
+					if (String.valueOf(current).equals("(") && tokens.get(tokens.size() - 1) instanceof NumberToken) {
+						tokens.add(new OperationToken("*"));
+					}
+				}
 				currentToken = new GroupingToken();
 				currentData = "";
 				currentData += Character.toString(current);
@@ -141,21 +146,24 @@ public class main extends JFrame {
 	}
 
 	private Equation handleGrouping(ArrayList<Token> list) {
-		if (hasGroupings(list) == true) {
+		while (hasGroupings(list) == true) {
 			ArrayList<Token> contents = new ArrayList<Token>();
 			ArrayList<String> listAsStrings = new ArrayList<String>();
 			for (int e = 0; e < list.size(); e++) {
 				listAsStrings.add(list.get(e).getValue());
 			}
-			for (int i = 1; i < listAsStrings.lastIndexOf(")")-listAsStrings.indexOf("("); i++) {
-				contents.add(list.get(listAsStrings.indexOf("(") + i));
+			for (int i = listAsStrings.lastIndexOf("(") + 1; i < listAsStrings
+					.subList(listAsStrings.lastIndexOf("("), listAsStrings.size()).indexOf(")")
+					+ listAsStrings.lastIndexOf("(");) {
+				contents.add(list.get(i));
+				list.remove(i);
+				listAsStrings.remove(i);
 			}
-			for (int i = listAsStrings.indexOf("("); i <= listAsStrings.lastIndexOf(""); i++) {
-				contents.remove(i);
-			}
-			contents = handleGrouping(contents).getTokens();
+			list.remove(listAsStrings.subList(listAsStrings.lastIndexOf("("), listAsStrings.size()).indexOf(")")
+					+ listAsStrings.lastIndexOf("("));
+			listAsStrings.remove(listAsStrings.lastIndexOf("("));
 			Equation item = new Equation(contents);
-			list.add(item);
+			list.set(listAsStrings.indexOf(")"), item);
 		}
 		return new Equation(list);
 	}
@@ -178,7 +186,6 @@ public class main extends JFrame {
 		for (int i = 0; i < tokens.size(); i++) {
 			if (tokens.get(i) instanceof Equation && doFirst != 3) {
 				doFirst = 3;
-				System.out.println("here");
 				locOfNext = i;
 			} else if (tokens.get(i) instanceof OperationToken) {
 				if ((((OperationToken) tokens.get(i)).getValue().equals("*")
@@ -203,12 +210,12 @@ public class main extends JFrame {
 									((OperationToken) tokens.get(locOfNext)).getValue())));
 			tokens.remove(locOfNext);
 			tokens.remove(locOfNext);
-			
+
 			ArrayList<Token> temp = calculate(new Equation(tokens));
 			tokens = temp;
 		} else if (doFirst == 3) {
 			tokens.set(locOfNext, calculate((Equation) tokens.get(locOfNext)).get(0));
-			tokens = calculate(handleGrouping(tokens))//; creating infinite loop 
+			tokens = calculate(handleGrouping(tokens));
 		}
 		return tokens;
 	}
