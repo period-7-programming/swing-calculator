@@ -260,20 +260,13 @@ public class Main extends JFrame {
 				currentData = "";
 			}
 
-			if (!currentData.equals("") && current.equals("(")) {
-				tokens.add(new NumberToken(currentData));
-				tokens.add(new OperationToken("*"));
-				tokens.add(new GroupingToken(current));
-				currentData = "";
-			}
-
 			// tokenization ^^
 
 		}
 		if (currentData != "") {
 			tokens.add(new NumberToken(currentData));
 		}
-
+		
 		// to display the arrayList
 		for (i = 0; i < tokens.size(); i++) {
 			Token a = (Token) tokens.get(i);
