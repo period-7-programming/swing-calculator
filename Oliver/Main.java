@@ -162,8 +162,7 @@ public class main extends JFrame {
 			list.remove(listAsStrings.subList(listAsStrings.lastIndexOf("("), listAsStrings.size()).indexOf(")")
 					+ listAsStrings.lastIndexOf("("));
 			Equation item = new Equation(contents);
-			list.set(listAsStrings.subList(listAsStrings.lastIndexOf("(")
-					, listAsStrings.size()).indexOf(")") 
+			list.set(listAsStrings.subList(listAsStrings.lastIndexOf("("), listAsStrings.size()).indexOf(")")
 					+ listAsStrings.lastIndexOf("(") - 1, item);
 			listAsStrings.remove(listAsStrings.lastIndexOf("("));
 		}
